@@ -45,6 +45,11 @@ class Time(object):
         self.set_date(time_temp.strftime("%d"))
         self.update_day(time_temp)
 
+    def inc_date(self):
+        self.date += 1
+        new_time = datetime(self.get_year(), self.get_month(), self.get_date() + 1)
+        self.update_day(new_time)
+
     def update_min(self, min):
         self.minutes += min
         if(self.minutes >= 60):
@@ -68,13 +73,18 @@ class Time(object):
         self.date = inp
 
     def get_hours(self):
-        if(self.hours == 0):
+        if(self.hours >= 0 and self.hours <= 9):
             return '0' + str(self.hours)
-        return str(self.hours)
+        else:
+            return str(self.hours)
+    def get_ihours(self):
+        return self.hours
     def get_min(self):
-        if(self.minutes == 0):
-            return '0' + str(self.hours)
+        if(self.minutes >= 0 and self.minutes <=9):
+            return '0' + str(self.minutes)
         return str(self.minutes)
+    def get_imin(self):
+        return self.minutes
     def get_year(self):
         return str(self.year)
     def get_iyear(self):
@@ -123,9 +133,12 @@ def parse_token(inp):
     time = Time()
     op = 0
     trange = 0
+    reminder = 0
     for pos in inp:
         val = pos[0]
         key = pos[1]
+        if(key == 'NN' and val == 'timer'):
+            reminder = 1
         if(key == 'IN' and val == 'for'):
             trange = 1
         if(key == 'RB' and val == 'now'):
@@ -138,7 +151,17 @@ def parse_token(inp):
                 tval = val
             else:
                 tval = text2int(val)
-    time.update_min(int(tval))
+    if(reminder == 1):
+        if(time.get_ihours() <= tval):
+            time.set_hours(tval)
+            time.set_min(0)
+        else:
+            time.inc_date()
+        return time.get_hours() + time.get_min() + " hours, " + time.get_day() + ", " + time.get_date() + " " + time.get_month() + ", " + time.get_year()
+    if(op == 0):
+        time.update_min(int(-tval))
+    else:
+        time.update_min(int(tval))
     if(trange == 1):
         return str(time.get_iyear() - tval) + " - " + time.get_year()
     return time.get_hours() + time.get_min() + " hours, " + time.get_day() + ", " + time.get_date() + " " + time.get_month() + ", " + time.get_year()
@@ -152,7 +175,8 @@ import nltk
 
 #input = raw_input("What do you want to do?\n")
 #input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
-input = "I was working in san francisco for last two years"
+#input = "I was working in san francisco for last two years"
+input = "Any timer after 15 is fine"
 tokens = nltk.sent_tokenize(input)
 
 for token in tokens:
