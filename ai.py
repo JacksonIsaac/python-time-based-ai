@@ -26,15 +26,17 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+print ("Loading AI")
 import nltk
 
 ## Uncomment this to download nltk packages
 #nltk.download("book")
 
-print ("Loading AI")
 input = raw_input("What do you want to do?\n")
 tokens = nltk.sent_tokenize(input)
 
 for token in tokens:
     tok = nltk.word_tokenize(token)
-    print nltk.pos_tag(tok)
+    t =  nltk.pos_tag(tok)
+    for a in t:
+        print a
