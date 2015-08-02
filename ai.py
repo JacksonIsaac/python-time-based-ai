@@ -68,8 +68,12 @@ class Time(object):
         self.date = inp
 
     def get_hours(self):
+        if(self.hours == 0):
+            return '0' + str(self.hours)
         return str(self.hours)
     def get_min(self):
+        if(self.minutes == 0):
+            return '0' + str(self.hours)
         return str(self.minutes)
     def get_year(self):
         return str(self.year)
