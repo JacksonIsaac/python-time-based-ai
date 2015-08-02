@@ -26,25 +26,90 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
+## Time class to store the time.
 class Time(object):
-    hours = 0.0
-    minutes = 0.0
-    year = 0000
-    month = 00
-    day = 00
+    def __init__(self):
+        self.hours = int(datetime.now().strftime("%H"))
+        self.minutes = int(datetime.now().strftime("%M"))
+        self.year = int(datetime.now().strftime("%Y"))
+        self.month = datetime.now().strftime("%B")
+        self.day = datetime.now().strftime("%A")
+        self.date = datetime.now().strftime("%d")
+    def update_hours(self, hrs):
+        self.hours += hrs
+        if(self.hours >= 24):
+            hours -= 24
+    def update_min(self, min):
+        self.minutes += min
+        if(self.minutes >= 60):
+            self.minutes -= 60
+            self.update_hours(1)
+    def get_hours(self):
+        return str(self.hours)
+    def get_min(self):
+        return str(self.minutes)
+    def get_year(self):
+        return str(self.year)
+    def get_month(self):
+        return self.month
+    def get_day(self):
+        return self.day
+    def get_date(self):
+        return self.date
+
+## Reference from: http://stackoverflow.com/a/493788
+## Convert string numbers to integers.
+def text2int(textnum, numwords={}):
+    if not numwords:
+      units = [
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+        "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+        "sixteen", "seventeen", "eighteen", "nineteen",
+      ]
+
+      tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+
+      scales = ["hundred", "thousand", "million", "billion", "trillion"]
+
+      numwords["and"] = (1, 0)
+      for idx, word in enumerate(units):    numwords[word] = (1, idx)
+      for idx, word in enumerate(tens):     numwords[word] = (1, idx * 10)
+      for idx, word in enumerate(scales):   numwords[word] = (10 ** (idx * 3 or 2), 0)
+
+    current = result = 0
+    for word in textnum.split():
+        if word not in numwords:
+          raise Exception("Illegal word: " + word)
+
+        scale, increment = numwords[word]
+        current = current * scale + increment
+        if scale > 100:
+            result += current
+            current = 0
+
+    return result + current
+
 
 def parse_token(inp):
+    time = Time()
+    op = 0
     for pos in inp:
-        if(pos[1] == 'RB' and pos[0] == 'now'):
-            curr_time =  datetime.now()
-            Time.hours = curr_time.strftime("%H")
-            Time.minutes = curr_time.strftime("%M")
-            Time.year = curr_time.strftime("%Y")
-            Time.month = curr_time.strftime("%m")
-            Time.day = curr_time.strftime("%d")
-            return Time.hours + ":" + Time.minutes + " hours, " + curr_time.strftime("%A") + ", " + Time.year 
+        val = pos[0]
+        key = pos[1]
+        if(key == 'RB' and val == 'now'):
+            curr_time = datetime.now() 
+        if(key == 'IN'):
+            if(val == 'from' or val == 'after'):
+                op = 1
+        if(key == 'CD'):
+            if(val.isdigit()):
+                tval = val
+            else:
+                tval = text2int(val)
+    time.update_min(int(tval))
+    return time.get_hours() + time.get_min() + " hours, " + time.get_day() + ", " + time.get_date() + " " + time.get_month() + ", " + time.get_year()
 
 
 print ("Loading AI")
@@ -59,5 +124,6 @@ tokens = nltk.sent_tokenize(input)
 for token in tokens:
     tok = nltk.word_tokenize(token)
     t =  nltk.pos_tag(tok)
+    print t
     res = parse_token(t)
     print res
