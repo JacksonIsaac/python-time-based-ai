@@ -77,6 +77,8 @@ class Time(object):
         return str(self.minutes)
     def get_year(self):
         return str(self.year)
+    def get_iyear(self):
+        return self.year
     def get_month(self):
         return self.month
     def get_day(self):
@@ -120,9 +122,12 @@ def text2int(textnum, numwords={}):
 def parse_token(inp):
     time = Time()
     op = 0
+    trange = 0
     for pos in inp:
         val = pos[0]
         key = pos[1]
+        if(key == 'IN' and val == 'for'):
+            trange = 1
         if(key == 'RB' and val == 'now'):
             curr_time = datetime.now() 
         if(key == 'IN'):
@@ -134,6 +139,8 @@ def parse_token(inp):
             else:
                 tval = text2int(val)
     time.update_min(int(tval))
+    if(trange == 1):
+        return str(time.get_iyear() - tval) + " - " + time.get_year()
     return time.get_hours() + time.get_min() + " hours, " + time.get_day() + ", " + time.get_date() + " " + time.get_month() + ", " + time.get_year()
 
 
@@ -144,7 +151,8 @@ import nltk
 #nltk.download("book")
 
 #input = raw_input("What do you want to do?\n")
-input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
+#input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
+input = "I was working in san francisco for last two years"
 tokens = nltk.sent_tokenize(input)
 
 for token in tokens:
