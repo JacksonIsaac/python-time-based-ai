@@ -40,12 +40,33 @@ class Time(object):
     def update_hours(self, hrs):
         self.hours += hrs
         if(self.hours >= 24):
-            hours -= 24
+            self.hours -= 24
+        time_temp = datetime.now() + timedelta(days=1)
+        self.set_date(time_temp.strftime("%d"))
+        self.update_day(time_temp)
+
     def update_min(self, min):
         self.minutes += min
         if(self.minutes >= 60):
             self.minutes -= 60
             self.update_hours(1)
+    
+    def update_day(self, time):
+        self.day = time.strftime("%A")
+
+    def set_hours(self, inp):
+        self.hours = inp
+    def set_min(self, inp):
+        self.minutes = inp
+    def set_year(self, inp):
+        self.year = inp
+    def set_month(self, inp):
+        self.month = inp
+    def set_day(self, inp):
+        self.day = inp
+    def set_date(self, inp):
+        self.date = inp
+
     def get_hours(self):
         return str(self.hours)
     def get_min(self):
@@ -118,7 +139,8 @@ import nltk
 ## Uncomment this to download nltk packages
 #nltk.download("book")
 
-input = raw_input("What do you want to do?\n")
+#input = raw_input("What do you want to do?\n")
+input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
 tokens = nltk.sent_tokenize(input)
 
 for token in tokens:
