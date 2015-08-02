@@ -35,6 +35,7 @@ class Time(object):
         self.minutes = int(datetime.now().strftime("%M"))
         self.year = int(datetime.now().strftime("%Y"))
         self.month = datetime.now().strftime("%B")
+        self.imonth = int(datetime.now().strftime("%m"))
         self.day = datetime.now().strftime("%A")
         self.date = datetime.now().strftime("%d")
     def update_hours(self, hrs):
@@ -46,8 +47,8 @@ class Time(object):
         self.update_day(time_temp)
 
     def inc_date(self):
-        self.date += 1
-        new_time = datetime(self.get_year(), self.get_month(), self.get_date() + 1)
+        self.date = int(self.date) + 1
+        new_time = datetime(self.get_iyear(), self.get_imonth(), self.get_date() + 1)
         self.update_day(new_time)
 
     def update_min(self, min):
@@ -85,6 +86,8 @@ class Time(object):
         return str(self.minutes)
     def get_imin(self):
         return self.minutes
+    def get_imonth(self):
+        return self.imonth
     def get_year(self):
         return str(self.year)
     def get_iyear(self):
@@ -95,6 +98,8 @@ class Time(object):
         return self.day
     def get_date(self):
         return self.date
+    def get_sdate(self):
+        return str(self.date)
 
 ## Reference from: http://stackoverflow.com/a/493788
 ## Convert string numbers to integers.
@@ -139,27 +144,33 @@ def parse_token(inp):
         key = pos[1]
         if(key == 'NN' and val == 'timer'):
             reminder = 1
-        if(key == 'IN' and val == 'for'):
-            trange = 1
-        if(key == 'RB' and val == 'now'):
-            curr_time = datetime.now() 
         if(key == 'IN'):
+            if(val == 'for'):
+                trange = 1
+            if(val == 'Before'):
+                reminder = 1
             if(val == 'from' or val == 'after'):
                 op = 1
+        if(key == 'RB' and val == 'now'):
+            curr_time = datetime.now() 
         if(key == 'CD'):
             if(val.isdigit()):
                 tval = val
             else:
                 tval = text2int(val)
     if(reminder == 1):
-        if(time.get_ihours() <= tval):
+        if(time.get_ihours() < int(tval)):
+            print time.get_ihours(), int(tval)
             time.set_hours(tval)
             time.set_min(0)
         else:
+            print "Incrementing date"
             time.inc_date()
-        return time.get_hours() + time.get_min() + " hours, " + time.get_day() + ", " + time.get_date() + " " + time.get_month() + ", " + time.get_year()
+            time.set_hours(tval)
+            time.set_min(0)
+        return "start: " + datetime.now().strftime("%H%M, %B %d, %Y") + " : end: " + time.get_hours() + time.get_min() + " hours, " + time.get_day() + ", " + time.get_sdate() + " " + time.get_month() + ", " + time.get_year()
     if(op == 0):
-        time.update_min(int(-tval))
+        time.update_min(-int(tval))
     else:
         time.update_min(int(tval))
     if(trange == 1):
@@ -176,7 +187,8 @@ import nltk
 #input = raw_input("What do you want to do?\n")
 #input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
 #input = "I was working in san francisco for last two years"
-input = "Any timer after 15 is fine"
+#input = "Any timer after 15 is fine"
+input = "Before 1 is good"
 tokens = nltk.sent_tokenize(input)
 
 for token in tokens:
