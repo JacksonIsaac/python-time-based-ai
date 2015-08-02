@@ -26,6 +26,27 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+from datetime import datetime
+
+class Time(object):
+    hours = 0.0
+    minutes = 0.0
+    year = 0000
+    month = 00
+    day = 00
+
+def parse_token(inp):
+    for pos in inp:
+        if(pos[1] == 'RB' and pos[0] == 'now'):
+            curr_time =  datetime.now()
+            Time.hours = curr_time.strftime("%H")
+            Time.minutes = curr_time.strftime("%M")
+            Time.year = curr_time.strftime("%Y")
+            Time.month = curr_time.strftime("%m")
+            Time.day = curr_time.strftime("%d")
+            return Time.hours + ":" + Time.minutes + " hours, " + curr_time.strftime("%A") + ", " + Time.year 
+
+
 print ("Loading AI")
 import nltk
 
@@ -38,5 +59,5 @@ tokens = nltk.sent_tokenize(input)
 for token in tokens:
     tok = nltk.word_tokenize(token)
     t =  nltk.pos_tag(tok)
-    for a in t:
-        print a
+    res = parse_token(t)
+    print res
