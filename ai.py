@@ -139,6 +139,8 @@ def parse_token(inp):
     op = 0
     trange = 0
     reminder = 0
+    future = 0
+    pm = 0
     for pos in inp:
         val = pos[0]
         key = pos[1]
@@ -151,6 +153,13 @@ def parse_token(inp):
                 reminder = 1
             if(val == 'from' or val == 'after'):
                 op = 1
+        if(key == 'NN'):
+            if(val == 'tomorrow'):
+                time.inc_date()
+                time.inc_date()
+                future = 1
+            if(val == 'evening'):
+                pm = 1
         if(key == 'RB' and val == 'now'):
             curr_time = datetime.now() 
         if(key == 'CD'):
@@ -158,6 +167,12 @@ def parse_token(inp):
                 tval = val
             else:
                 tval = text2int(val)
+    if(future == 1):
+        if(pm == 1 and int(tval) < 12):
+            tval = int(tval) + 12
+        time.set_hours(tval)
+        time.set_min(0)
+        return time.get_hours() + time.get_min() + " hours, " + time.get_day() + ", " + time.get_sdate() + " " + time.get_month() + ", " + time.get_year()
     if(reminder == 1):
         if(time.get_ihours() < int(tval)):
             print time.get_ihours(), int(tval)
@@ -185,10 +200,10 @@ import nltk
 #nltk.download("book")
 
 #input = raw_input("What do you want to do?\n")
-#input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
+input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
 #input = "I was working in san francisco for last two years"
 #input = "Any timer after 15 is fine"
-input = "Before 1 is good"
+#input = "Before 1 is good"
 tokens = nltk.sent_tokenize(input)
 
 for token in tokens:
