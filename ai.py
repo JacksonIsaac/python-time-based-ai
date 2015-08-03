@@ -141,6 +141,7 @@ def parse_token(inp):
     reminder = 0
     future = 0
     pm = 0
+    tval = 0
     for pos in inp:
         val = pos[0]
         key = pos[1]
@@ -199,8 +200,8 @@ import nltk
 ## Uncomment this to download nltk packages
 #nltk.download("book")
 
-#input = raw_input("What do you want to do?\n")
-input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
+input = raw_input("What do you want to do?\n")
+#input = "Looking to a make reservation for two people day after tomorrow at seven in the evening"
 #input = "I was working in san francisco for last two years"
 #input = "Any timer after 15 is fine"
 #input = "Before 1 is good"
